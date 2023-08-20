@@ -1,0 +1,53 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Biliw" parent="Theme.Material3.DayNight.NoActionBar" />
+
+    <style name="Text" parent="@style/TextAppearance.AppCompat.Small">
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="Text.Button" parent="Text">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+
+    <style name="TitleBar">
+        <item name="android:background">?android:attr/colorPrimary</item>
+        <item name="android:height">32dp</item>
+        <item name="android:textAppearance">@style/Text.Button</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="VectorIcon">
+        <item name="android:backgroundTint">#555555</item>
+    </style>
+
+    <style name="Avatar">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="Button.ExtremeSmall.Transparent" parent="Widget.AppCompat.Button">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:padding">2dp</item>
+    </style>
+
+    <style name="Button.ExtremeSmall" parent="Button.ExtremeSmall.Transparent">
+        <item name="android:background">?android:attr/colorPrimary</item>
+        <item name="android:textAppearance">@style/Text.Button</item>
+    </style>
+
+    <style name="PlayerControllerBar">
+        <item name="android:background">#7f000000</item>
+    </style>
+
+    <style name="Theme.Biliw" parent="Base.Theme.Biliw" />
+
+    <!--<reference from="https://github.com/ikew0ng/SwipeBackLayout/blob/master/library/src/main/res/values/styles.xml">-->
+    <style name="SwipeBackLayout">
+        <item name="edge_size">50dip</item>
+    </style>
+    <!--</reference>-->
+</resources>
