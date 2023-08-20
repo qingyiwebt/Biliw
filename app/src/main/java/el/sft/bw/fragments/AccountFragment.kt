@@ -6,15 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.GestureDetector
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.NestedScrollingChild
-import androidx.core.view.NestedScrollingChildHelper
-import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import el.sft.bw.R
 import el.sft.bw.activities.LoginActivity
@@ -49,13 +44,13 @@ class AccountFragment : ScrollableFragment() {
 
         binding.logoutButton.setOnClickListener {
             PrefsUtils.currentCookieJar.clearCookies()
-            broadcastManager.sendBroadcast(Intent(LocalBroadcastUtils.ACCOUNT_CHANGED))
+            broadcastManager.sendBroadcast(Intent(LocalBroadcastUtils.ACTION_ACCOUNT_CHANGED))
         }
 
         broadcastManager = LocalBroadcastManager.getInstance(this.requireContext())
         broadcastManager.registerReceiver(
             broadcastReceiver,
-            IntentFilter(LocalBroadcastUtils.ACCOUNT_CHANGED)
+            IntentFilter(LocalBroadcastUtils.ACTION_ACCOUNT_CHANGED)
         )
 
         requestReloadAccount()
@@ -99,7 +94,7 @@ class AccountFragment : ScrollableFragment() {
 
     inner class LocalBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == LocalBroadcastUtils.ACCOUNT_CHANGED) {
+            if (intent?.action == LocalBroadcastUtils.ACTION_ACCOUNT_CHANGED) {
                 requestReloadAccount()
             }
         }

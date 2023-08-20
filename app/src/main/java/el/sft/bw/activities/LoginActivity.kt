@@ -1,7 +1,6 @@
 package el.sft.bw.activities
 
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
@@ -68,7 +67,7 @@ class LoginActivity : SwipeBackAppCompatActivity() {
                             .makeText(applicationContext, R.string.finish_login, Toast.LENGTH_LONG)
                             .show()
 
-                        broadcastManager.sendBroadcast(Intent(LocalBroadcastUtils.ACCOUNT_CHANGED))
+                        broadcastManager.sendBroadcast(Intent(LocalBroadcastUtils.ACTION_ACCOUNT_CHANGED))
                         finish()
                     }
                 }

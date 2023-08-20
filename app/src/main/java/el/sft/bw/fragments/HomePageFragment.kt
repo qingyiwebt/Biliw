@@ -1,20 +1,24 @@
 package el.sft.bw.fragments
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import el.sft.bw.R
 import el.sft.bw.databinding.FragmentHomePageBinding
+import el.sft.bw.utils.LocalBroadcastUtils
 
 class HomePageFragment : Fragment() {
 
     private lateinit var binding: FragmentHomePageBinding
     private lateinit var viewPagerAdapter: ViewPagerAdapter
+    private lateinit var localBroadcastManager: LocalBroadcastManager
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -31,9 +35,12 @@ class HomePageFragment : Fragment() {
             }
         })
 
+        localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
+
         binding.titleBar.setOnClickListener {
             if (binding.pager.currentItem != RECOMMENDED_VIDEO)
                 binding.pager.setCurrentItem(RECOMMENDED_VIDEO, true)
+            else localBroadcastManager.sendBroadcast(Intent(LocalBroadcastUtils.ACTION_OPEN_DRAWER))
         }
 
         return binding.root

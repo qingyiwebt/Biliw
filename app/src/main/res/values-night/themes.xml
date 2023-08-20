@@ -14,4 +14,8 @@
     <style name="VectorIcon">
         <item name="android:backgroundTint">@color/white</item>
     </style>
+
+    <style name="Drawer">
+        <item name="android:background">?android:attr/colorBackground</item>
+    </style>
 </resources>
