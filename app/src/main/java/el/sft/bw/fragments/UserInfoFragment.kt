@@ -10,6 +10,7 @@ import el.sft.bw.R
 import el.sft.bw.databinding.FragmentUserInfoBinding
 import el.sft.bw.framework.components.ScrollableFragment
 import el.sft.bw.network.ApiClient
+import el.sft.bw.utils.setClipboardPlainText
 import el.sft.bw.utils.toHumanReadable
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,15 @@ class UserInfoFragment : ScrollableFragment() {
 
         }
 
+        binding.userId.text = currentUserId.toString()
+        binding.userId.setOnClickListener {
+            setClipboardPlainText(requireContext(), currentUserId.toString())
+
+            Toast
+                .makeText(requireContext(), R.string.copied, Toast.LENGTH_LONG)
+                .show()
+        }
+
         requestLoadUserInfo()
 
         return binding.root
@@ -61,7 +71,8 @@ class UserInfoFragment : ScrollableFragment() {
 
                 withContext(Dispatchers.Main) {
                     binding.uploaderName.text = cardData.name ?: "-"
-                    binding.followerCount.text = (cardData.followCount ?: 0L).toHumanReadable()
+                    binding.followerCount.text = (cardData.followerCount ?: 0L).toHumanReadable()
+                    binding.followCount.text = (cardData.followCount ?: 0L).toHumanReadable()
                     binding.description.text = cardData.description ?: "-"
                     val detailStringJoiner = StringJoiner(" ")
                     detailStringJoiner.add("LV${cardData.levelInfo?.level ?: 0}")

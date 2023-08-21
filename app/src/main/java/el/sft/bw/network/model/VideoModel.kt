@@ -17,6 +17,7 @@ data class VideoModel(
     @SerializedName("duration") var duration: Int? = null,
     @SerializedName("pubdate") var pubdate: Long? = null,
     @SerializedName("owner") var owner: VideoOwner? = VideoOwner(),
+    @SerializedName("upper") var upper: VideoOwner? = VideoOwner(),
     @SerializedName("stat") var stat: VideoStat? = VideoStat(),
     @SerializedName("avfeature") var avfeature: String? = null,
     @SerializedName("isfollowed") var isfollowed: Int? = null,

@@ -1,8 +1,11 @@
 package el.sft.bw.network
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import el.sft.bw.network.dto.BaseResponse
+import el.sft.bw.network.dto.FavListsResponse
+import el.sft.bw.network.dto.FavVideosResponse
 import el.sft.bw.network.dto.NavResponse
 import el.sft.bw.network.dto.QrCodeLoginResponse
 import el.sft.bw.network.dto.RecommendedVideosResponse
@@ -47,6 +50,12 @@ object ApiClient {
 
     private val baseResponseWithUserSpaceModelType =
         object : TypeToken<BaseResponse<UserSpaceResponse>>() {}.type
+
+    private val baseResponseWithFavListsResponseType =
+        object : TypeToken<BaseResponse<FavListsResponse>>() {}.type
+
+    private val baseResponseWithFavVideosResponseType =
+        object : TypeToken<BaseResponse<FavVideosResponse>>() {}.type
 
     private var wbiKey = ""
 
@@ -246,6 +255,7 @@ object ApiClient {
             .execute()
 
         val str = res.body?.string()
+        Log.v("ApiClient", str ?: "")
     }
 
     fun getVideoStream(
@@ -274,6 +284,52 @@ object ApiClient {
         val str = res.body?.string()
 
         return Gson().fromJson(str, baseResponseWithVideoStreamResponseType)
+    }
+
+    fun getFavLists(userId: Long): BaseResponse<FavListsResponse> {
+        val query = generateSignedQuery(
+            mutableMapOf(
+                "up_mid" to userId.toString()
+            )
+        )
+
+        val req = Request.Builder()
+            .url("https://api.bilibili.com/x/v3/fav/folder/created/list-all?$query")
+            .header("Referer", "https://space.bilibili.com/$userId")
+            .get()
+            .build()
+
+        val res = GlobalHttpClientUtils.httpClient
+            .newCall(req)
+            .execute()
+
+        val str = res.body?.string()
+
+        return Gson().fromJson(str, baseResponseWithFavListsResponseType)
+    }
+
+    fun getFavVideos(mlid: Long, page: Int): BaseResponse<FavVideosResponse> {
+        val query = generateSignedQuery(
+            mutableMapOf(
+                "media_id" to mlid.toString(),
+                "ps" to "20",
+                "pn" to page.toString()
+            )
+        )
+
+        val req = Request.Builder()
+            .url("https://api.bilibili.com/x/v3/fav/resource/list?$query")
+            .header("Referer", "https://space.bilibili.com/")
+            .get()
+            .build()
+
+        val res = GlobalHttpClientUtils.httpClient
+            .newCall(req)
+            .execute()
+
+        val str = res.body?.string()
+
+        return Gson().fromJson(str, baseResponseWithFavVideosResponseType)
     }
 
     fun reloadCookie() {

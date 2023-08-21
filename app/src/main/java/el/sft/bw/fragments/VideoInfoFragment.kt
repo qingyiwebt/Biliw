@@ -1,6 +1,9 @@
 package el.sft.bw.fragments
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import el.sft.bw.R
 import el.sft.bw.activities.PlayerActivity
 import el.sft.bw.activities.UserCenterActivity
@@ -18,12 +22,14 @@ import el.sft.bw.framework.components.ScrollableFragment
 import el.sft.bw.network.ApiClient
 import el.sft.bw.network.model.UserCardModel
 import el.sft.bw.network.simplestruct.VideoPage
+import el.sft.bw.utils.setClipboardPlainText
 import el.sft.bw.utils.toHumanReadable
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 
 class VideoInfoFragment : ScrollableFragment() {
     private lateinit var episodesAdapter: VideoPageArrayAdapter
@@ -73,6 +79,15 @@ class VideoInfoFragment : ScrollableFragment() {
             binding.description.maxLines = if (descriptionExpanded) 3 else 256
         }
 
+
+        binding.videoId.setOnClickListener {
+            setClipboardPlainText(requireContext(), currentBvId)
+
+            Toast
+                .makeText(requireContext(), R.string.copied, Toast.LENGTH_LONG)
+                .show()
+        }
+
         requestLoadVideoInfo()
 
         return binding.root
@@ -118,6 +133,7 @@ class VideoInfoFragment : ScrollableFragment() {
                     binding.viewCount.text = videoModel?.stat?.view?.toHumanReadable() ?: "-"
                     binding.description.text =
                         if (videoModel?.desc == null || videoModel.desc?.isEmpty() != false) "-" else videoModel.desc
+                    binding.videoId.text = currentBvId
 
                     if (videoModel?.pages != null) {
                         episodesList.addAll(videoModel.pages)

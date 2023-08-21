@@ -59,6 +59,16 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/videoId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:paddingHorizontal="8dp"
+            android:textAppearance="@style/Text"
+            tools:text="av114514" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -136,7 +146,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/favourite" />
+                    android:text="@string/title_favorite" />
             </LinearLayout>
 
             <LinearLayout
@@ -195,7 +205,7 @@
 
         <ListView
             android:id="@+id/episodesList"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

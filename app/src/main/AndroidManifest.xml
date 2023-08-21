@@ -25,6 +25,9 @@
         android:theme="@style/Theme.Biliw"
         tools:targetApi="31">
         <activity
+            android:name=".activities.FavoriteVideosActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.UserCenterActivity"
             android:exported="false" />
         <activity

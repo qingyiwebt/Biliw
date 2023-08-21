@@ -1,51 +1,61 @@
-package el.sft.bw.fragments
+package el.sft.bw.activities
 
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import el.sft.bw.R
-import el.sft.bw.activities.VideoActivity
 import el.sft.bw.components.VideoCardData
 import el.sft.bw.components.VideoCardLayout
-import el.sft.bw.databinding.FragmentRecommendedVideosBinding
+import el.sft.bw.databinding.ActivityFavoriteVideosBinding
 import el.sft.bw.framework.SpacingDecoration
+import el.sft.bw.framework.activities.SwipeBackAppCompatActivity
 import el.sft.bw.framework.components.RecyclerItemClickListener
 import el.sft.bw.framework.viewbinding.ListBindingAdapter
 import el.sft.bw.network.ApiClient
-import el.sft.bw.network.model.VideoModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RecommendedVideosFragment : Fragment() {
-    private lateinit var binding: FragmentRecommendedVideosBinding
+class FavoriteVideosActivity : SwipeBackAppCompatActivity() {
+    private lateinit var binding: ActivityFavoriteVideosBinding
     private val videoList: ArrayList<VideoCardData> = ArrayList()
     private val videoAdapter = ListBindingAdapter(videoList) { VideoCardLayout() }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentRecommendedVideosBinding.inflate(inflater, container, false)
+    private var currentMlid: Long = -1
+    private var currentPage: Int = 1
 
-        binding.videoList.adapter = videoAdapter
-        binding.videoList.addItemDecoration(SpacingDecoration(6))
-        binding.videoList.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.videoList.addOnItemTouchListener(
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityFavoriteVideosBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        intent.let {
+            currentMlid = intent.getLongExtra("mlid", -1)
+            if (currentMlid == -1L) finish()
+        }
+
+        binding.titleBar.setOnClickListener { finish() }
+        binding.refreshLayout.setOnRefreshListener { requestLoadList() }
+        binding.favVideoList.adapter = videoAdapter
+        binding.favVideoList.addItemDecoration(SpacingDecoration(6))
+        binding.favVideoList.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.favVideoList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!recyclerView.canScrollVertically(1)) requestLoadList(false)
+            }
+        })
+        binding.favVideoList.addOnItemTouchListener(
             RecyclerItemClickListener(
-                this.requireContext(),
-                binding.videoList,
+                this,
+                binding.favVideoList,
                 object : RecyclerItemClickListener.OnItemClickListener {
                     override fun onItemClick(view: View?, position: Int) {
                         val data = videoList[position]
@@ -56,31 +66,23 @@ class RecommendedVideosFragment : Fragment() {
                     override fun onLongItemClick(view: View?, position: Int) {}
                 })
         )
-        binding.videoList.addOnScrollListener(object : OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (!recyclerView.canScrollVertically(1)) requestVideoLoad(false)
-            }
-        })
 
-        binding.refreshLayout.setOnRefreshListener { requestVideoLoad(true) }
-
-        requestVideoLoad(true)
-
-        return binding.root
+        requestLoadList()
     }
 
+
     private fun onVideoCardClick(videoCardData: VideoCardData) {
-        Intent(this.requireContext(), VideoActivity::class.java).also {
+        Intent(this, VideoActivity::class.java).also {
             it.putExtra("bvId", videoCardData.bvId)
             startActivity(it)
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private fun requestVideoLoad(clearAll: Boolean) {
+    private fun requestLoadList(clearAll: Boolean = true) {
         binding.refreshLayout.isRefreshing = true
         if (clearAll) {
+            currentPage = 1
             val beforeCount = videoList.size
             videoList.clear()
             videoAdapter.notifyItemRangeRemoved(0, beforeCount)
@@ -88,34 +90,34 @@ class RecommendedVideosFragment : Fragment() {
 
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                ApiClient.reloadCookie();
-                val res = ApiClient.getRecommendedVideos()
-
+                ApiClient.reloadCookie()
+                val res = ApiClient.getFavVideos(currentMlid, currentPage)
                 withContext(Dispatchers.Main) {
-                    val items: ArrayList<VideoModel> = res.data?.item ?: return@withContext
-
                     val beforeCount = videoList.size
-                    videoList.addAll(items.map { x ->
+                    val list = res.data!!.items
+
+                    videoList.addAll(list.map { x ->
                         VideoCardData(
                             x.title!!,
-                            x.owner!!.name!!,
+                            x.upper!!.name!!,
                             x.stat?.view ?: 0L,
-                            x.pic!!,
+                            x.cover!!,
                             x.bvid!!
                         )
                     })
 
-                    videoAdapter.notifyItemRangeInserted(
-                        beforeCount,
-                        items.size
-                    )
+                    videoAdapter.notifyItemRangeInserted(beforeCount, list.size)
                 }
+                currentPage++
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    val ctx = requireContext()
                     Toast
-                        .makeText(ctx, R.string.error_load_failed, Toast.LENGTH_LONG)
+                        .makeText(
+                            this@FavoriteVideosActivity,
+                            R.string.error_load_failed,
+                            Toast.LENGTH_LONG
+                        )
                         .show()
                 }
             } finally {

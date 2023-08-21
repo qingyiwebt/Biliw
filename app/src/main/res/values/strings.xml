@@ -111,7 +111,7 @@
     <string name="error_login_timeout">登录二维码已过期</string>
     <string name="error_login_not_be_scanned">二维码还未扫描</string>
     <string name="error_login_unconfirmed">未确认</string>
-    <string name="favourite">收藏</string>
+    <string name="title_favorite">收藏</string>
     <string name="like">点赞</string>
     <string name="coin">投币</string>
     <string name="view_cover">查看封面</string>
@@ -126,4 +126,8 @@
     <string name="followerCount">"粉丝: "</string>
     <string name="follow">关注</string>
     <string name="unfollow">取消关注</string>
+    <string name="followCount">"关注: "</string>
+    <string name="copied">已复制</string>
+    <string name="userId">"UID: "</string>
+    <string name="title_home_page">主页</string>
 </resources>

@@ -2,18 +2,16 @@ package el.sft.bw.activities
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.media3.common.MediaItem
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import el.sft.bw.R
 import el.sft.bw.databinding.ActivityPlayerBinding
-import el.sft.bw.framework.activities.SwipeBackAppCompatActivity
 import el.sft.bw.network.ApiClient
 import el.sft.bw.network.dto.VideoStreamResponse
 import el.sft.bw.utils.GlobalHttpClientUtils
@@ -25,7 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class PlayerActivity : SwipeBackAppCompatActivity() {
+class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
 
     private lateinit var player: ExoPlayer
@@ -60,6 +58,8 @@ class PlayerActivity : SwipeBackAppCompatActivity() {
                     ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
+
+        binding.controller.backAction = Runnable { finish() }
 
         intent.let {
             currentSource = it.getIntExtra("source", SOURCE_UNKNOWN)

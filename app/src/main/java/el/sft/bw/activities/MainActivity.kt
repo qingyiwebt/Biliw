@@ -89,7 +89,15 @@ class MainActivity : SwipeBackAppCompatActivity() {
             IntentFilter(LocalBroadcastUtils.ACTION_ACCOUNT_CHANGED)
         )
 
+        binding.gotoHomePage.setOnClickListener { gotoFragment(HOME_PAGE) }
+        binding.gotoFavorite.setOnClickListener { gotoFragment(FAV_LIST) }
+
         requestReloadAccount()
+    }
+
+    private fun gotoFragment(index: Int) {
+        binding.pager.setCurrentItem(index, false)
+        binding.root.closeDrawers()
     }
 
     @OptIn(DelicateCoroutinesApi::class)

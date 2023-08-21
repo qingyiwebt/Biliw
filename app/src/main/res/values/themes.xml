@@ -41,13 +41,19 @@
         <item name="android:padding">2dp</item>
     </style>
 
+    <style name="Button.Small.Transparent" parent="Widget.AppCompat.Button">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:minHeight">32dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:padding">2dp</item>
+    </style>
+
     <style name="Button.ExtremeSmall" parent="Button.ExtremeSmall.Transparent">
         <item name="android:background">?android:attr/colorPrimary</item>
         <item name="android:textAppearance">@style/Text.Button</item>
     </style>
 
     <style name="PlayerControllerBar">
-        <item name="android:background">#7f000000</item>
     </style>
 
     <style name="Drawer">

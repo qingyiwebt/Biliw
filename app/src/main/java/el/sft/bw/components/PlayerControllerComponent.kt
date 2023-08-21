@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -16,6 +17,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import el.sft.bw.R
 import el.sft.bw.databinding.LayoutPlayerControllerBinding
+import kotlin.math.abs
 
 class PlayerControllerComponent : FrameLayout {
     private lateinit var binding: LayoutPlayerControllerBinding
@@ -25,6 +27,12 @@ class PlayerControllerComponent : FrameLayout {
     private var isProgressBarDragging = false
     private var isRootDoubleClick = false
     private var isLongPressSpeedUp = false
+    private var isSwipeProgressChanging = false
+
+    private var swipeProgressChangingBeginX = 0f
+    private var swipeProgressChangingBeginProgress = 0L
+    private var swipeProgressChangingMinDistance = 16f
+    private var swipeProgressChangingUnit = 20f
 
     private val progressWatcherRunnable = Runnable { progressWatch() }
     private var durationString: String = "0:0:0"
@@ -40,6 +48,7 @@ class PlayerControllerComponent : FrameLayout {
         }
 
     var rotateAction: Runnable? = null
+    var backAction: Runnable? = null
 
     var title: String
         set(value) {
@@ -67,6 +76,13 @@ class PlayerControllerComponent : FrameLayout {
         val inflater = LayoutInflater.from(context)
         binding = LayoutPlayerControllerBinding.inflate(inflater, this, true)
 
+        val displayMetrics = resources.displayMetrics
+        swipeProgressChangingMinDistance =
+            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_MM, 5f, displayMetrics)
+
+        swipeProgressChangingUnit =
+            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_MM, 10f, displayMetrics)
+
         updateDisplayState()
         binding.root.setOnClickListener {
             if (isRootDoubleClick) {
@@ -76,16 +92,35 @@ class PlayerControllerComponent : FrameLayout {
             }
 
             isRootDoubleClick = true
-            handler.postDelayed({ isRootDoubleClick = false }, 750)
+            handler.postDelayed({ isRootDoubleClick = false }, 500)
 
             isControllerDisplay = !isControllerDisplay
             updateDisplayState()
         }
 
-        binding.root.setOnLongClickListener { beginLongPress(); true }
+        binding.root.setOnLongClickListener {
+            if (!isSwipeProgressChanging)
+                beginLongPress();
+            return@setOnLongClickListener true
+        }
         binding.root.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_UP) {
-                endLongPress()
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    swipeProgressChangingBeginX = event.rawX
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    if (!isSwipeProgressChanging && abs(event.rawX - swipeProgressChangingBeginX) > swipeProgressChangingMinDistance && !isLongPressSpeedUp) {
+                        beginSwipeProgressChanging()
+                    }
+
+                    if (isSwipeProgressChanging) swipeProgressChanging(event.rawX)
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    endSwipeProgressChanging()
+                    endLongPress()
+                }
             }
             false
         }
@@ -105,18 +140,19 @@ class PlayerControllerComponent : FrameLayout {
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                player?.playWhenReady = false
+                // player?.playWhenReady = false
                 isProgressBarDragging = true
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 isProgressBarDragging = false
-                player?.playWhenReady = true
+                // player?.playWhenReady = true
             }
         })
 
         binding.playButton.setOnClickListener { togglePause() }
         binding.rotateButton.setOnClickListener { rotateAction?.run() }
+        binding.backButton.setOnClickListener { backAction?.run() }
 
         binding.forwardButton.setOnClickListener { player?.seekForward() }
         binding.replayButton.setOnClickListener { player?.seekBack() }
@@ -143,13 +179,38 @@ class PlayerControllerComponent : FrameLayout {
     }
 
     private fun beginLongPress() {
+        isControllerDisplay = false
+        updateDisplayState()
         isLongPressSpeedUp = true
         player?.setPlaybackSpeed(3f)
     }
 
     private fun endLongPress() {
         if (!isLongPressSpeedUp) return
+        isLongPressSpeedUp = false
         player?.setPlaybackSpeed(1f)
+    }
+
+    private fun beginSwipeProgressChanging() {
+        isControllerDisplay = true
+        updateDisplayState()
+        isSwipeProgressChanging = true
+        swipeProgressChangingBeginProgress = player?.currentPosition ?: 0L
+    }
+
+    private fun endSwipeProgressChanging() {
+        isSwipeProgressChanging = false
+    }
+
+    private fun swipeProgressChanging(currentX: Float) {
+        if (!isSwipeProgressChanging) return
+
+        val deltaX = currentX - swipeProgressChangingBeginX
+        val progress =
+            swipeProgressChangingBeginProgress + (deltaX / swipeProgressChangingUnit * 10000).toLong()
+        player?.seekTo(progress)
+        binding.progressBar.progress = progress.toInt()
+        updateElapsedTime(progress)
     }
 
     private fun beginProgressWatch() {
@@ -179,6 +240,7 @@ class PlayerControllerComponent : FrameLayout {
         handler.postDelayed(progressWatcherRunnable, 1000)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateElapsedTime(ms: Long) {
         binding.timeText.text = "${DateUtils.formatElapsedTime(ms / 1000)} / $durationString"
     }
