@@ -13,6 +13,7 @@ import el.sft.bw.network.dto.UserCardResponse
 import el.sft.bw.network.dto.VideoDetailResponse
 import el.sft.bw.network.dto.VideoStreamResponse
 import el.sft.bw.network.dto.UserSpaceResponse
+import el.sft.bw.network.dto.UserVideosResponse
 import el.sft.bw.network.model.VideoModel
 import el.sft.bw.utils.CryptoUtils
 import el.sft.bw.utils.GlobalHttpClientUtils
@@ -56,6 +57,9 @@ object ApiClient {
 
     private val baseResponseWithFavVideosResponseType =
         object : TypeToken<BaseResponse<FavVideosResponse>>() {}.type
+
+    private val baseResponseWithUserVideosResponseType =
+        object : TypeToken<BaseResponse<UserVideosResponse>>() {}.type
 
     private var wbiKey = ""
 
@@ -330,6 +334,30 @@ object ApiClient {
         val str = res.body?.string()
 
         return Gson().fromJson(str, baseResponseWithFavVideosResponseType)
+    }
+
+    fun getUserVideos(userId: Long, page: Int): BaseResponse<UserVideosResponse> {
+        val query = generateSignedQuery(
+            mutableMapOf(
+                "mid" to userId.toString(),
+                "ps" to "20",
+                "pn" to page.toString()
+            )
+        )
+
+        val req = Request.Builder()
+            .url("https://api.bilibili.com/x/space/arc/search?$query")
+            .header("Referer", "https://space.bilibili.com/$userId")
+            .get()
+            .build()
+
+        val res = GlobalHttpClientUtils.httpClient
+            .newCall(req)
+            .execute()
+
+        val str = res.body?.string()
+
+        return Gson().fromJson(str, baseResponseWithUserVideosResponseType)
     }
 
     fun reloadCookie() {

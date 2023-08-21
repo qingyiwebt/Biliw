@@ -1,19 +1,21 @@
-package el.sft.bw.activities
+package el.sft.bw.fragments
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import el.sft.bw.R
+import el.sft.bw.activities.VideoActivity
 import el.sft.bw.components.VideoCardData
 import el.sft.bw.components.VideoCardLayout
-import el.sft.bw.databinding.ActivityFavoriteVideosBinding
+import el.sft.bw.databinding.FragmentUserVideosBinding
 import el.sft.bw.framework.SpacingDecoration
-import el.sft.bw.framework.activities.SwipeBackAppCompatActivity
 import el.sft.bw.framework.components.RecyclerItemClickListener
+import el.sft.bw.framework.components.ScrollableFragment
 import el.sft.bw.framework.viewbinding.ListBindingAdapter
 import el.sft.bw.network.ApiClient
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -22,41 +24,40 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FavoriteVideosActivity : SwipeBackAppCompatActivity() {
-    private lateinit var binding: ActivityFavoriteVideosBinding
-    private val videoList: ArrayList<VideoCardData> = ArrayList()
-    private val videoAdapter = ListBindingAdapter(videoList) { VideoCardLayout() }
+class UserVideosFragment : ScrollableFragment() {
+    private lateinit var binding: FragmentUserVideosBinding
 
-    private var currentMlid: Long = -1
+
     private var currentPage: Int = 1
     private var isEnded = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityFavoriteVideosBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    private val videoList: ArrayList<VideoCardData> = arrayListOf()
+    private val videoAdapter = ListBindingAdapter(videoList) { VideoCardLayout() }
+    private var currentUserId: Long = -1
 
-        intent.let {
-            currentMlid = intent.getLongExtra("mlid", -1)
-            if (currentMlid == -1L) finish()
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentUserVideosBinding.inflate(inflater, container, false)
+        requireArguments().let {
+            currentUserId = it.getLong("userId", 1)
         }
 
-        binding.titleBar.setOnClickListener { finish() }
-        binding.refreshLayout.setOnRefreshListener { requestLoadList() }
-        binding.favVideoList.adapter = videoAdapter
-        binding.favVideoList.addItemDecoration(SpacingDecoration(6))
-        binding.favVideoList.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        binding.favVideoList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.videoList.adapter = videoAdapter
+        binding.videoList.addItemDecoration(SpacingDecoration(6))
+        binding.videoList.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.videoList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (!recyclerView.canScrollVertically(1)) requestLoadList(false)
+                if (!recyclerView.canScrollVertically(1)) requestLoadVideos(false)
             }
         })
-        binding.favVideoList.addOnItemTouchListener(
+        binding.videoList.addOnItemTouchListener(
             RecyclerItemClickListener(
-                this,
-                binding.favVideoList,
+                requireContext(),
+                binding.videoList,
                 object : RecyclerItemClickListener.OnItemClickListener {
                     override fun onItemClick(view: View?, position: Int) {
                         val data = videoList[position]
@@ -68,18 +69,19 @@ class FavoriteVideosActivity : SwipeBackAppCompatActivity() {
                 })
         )
 
-        requestLoadList()
+        requestLoadVideos()
+        return binding.root
     }
 
     private fun onVideoCardClick(videoCardData: VideoCardData) {
-        Intent(this, VideoActivity::class.java).also {
+        Intent(requireContext(), VideoActivity::class.java).also {
             it.putExtra("bvId", videoCardData.bvId)
             startActivity(it)
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private fun requestLoadList(clearAll: Boolean = true) {
+    private fun requestLoadVideos(clearAll: Boolean = true) {
         if (clearAll) {
             currentPage = 1
             isEnded = false
@@ -94,23 +96,22 @@ class FavoriteVideosActivity : SwipeBackAppCompatActivity() {
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 ApiClient.reloadCookie()
-                val res = ApiClient.getFavVideos(currentMlid, currentPage)
+                val res = ApiClient.getUserVideos(currentUserId, currentPage)
                 withContext(Dispatchers.Main) {
-                    val beforeCount = videoList.size
-                    val list = res.data!!.items
+                    val list = res.data!!.videoList.videoList
 
+                    val beforeCount = videoList.size
                     videoList.addAll(list.map { x ->
                         VideoCardData(
                             x.title!!,
-                            x.upper!!.name!!,
-                            x.stat?.view ?: 0L,
-                            x.cover!!,
+                            x.author ?: "-",
+                            x.playCount ?: 0L,
+                            x.pic!!,
                             x.bvid!!
                         )
                     })
 
                     videoAdapter.notifyItemRangeInserted(beforeCount, list.size)
-
                     if (list.size < 20) isEnded = true
                 }
                 currentPage++
@@ -119,7 +120,7 @@ class FavoriteVideosActivity : SwipeBackAppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     Toast
                         .makeText(
-                            this@FavoriteVideosActivity,
+                            requireContext(),
                             R.string.error_load_failed,
                             Toast.LENGTH_LONG
                         )

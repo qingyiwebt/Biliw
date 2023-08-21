@@ -125,6 +125,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/title_favorite" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/gotoSearch"
+                style="@style/Button.Small.Transparent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/title_search"
+                android:textAppearance="@style/Text.Drawer" />
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

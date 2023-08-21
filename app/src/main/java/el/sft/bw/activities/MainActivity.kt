@@ -18,6 +18,7 @@ import el.sft.bw.R
 import el.sft.bw.databinding.ActivityMainBinding
 import el.sft.bw.fragments.FavListFragment
 import el.sft.bw.fragments.HomePageFragment
+import el.sft.bw.fragments.SearchFragment
 import el.sft.bw.framework.activities.SwipeBackAppCompatActivity
 import el.sft.bw.network.ApiClient
 import el.sft.bw.network.dto.NavResponse
@@ -91,6 +92,7 @@ class MainActivity : SwipeBackAppCompatActivity() {
 
         binding.gotoHomePage.setOnClickListener { gotoFragment(HOME_PAGE) }
         binding.gotoFavorite.setOnClickListener { gotoFragment(FAV_LIST) }
+        binding.gotoSearch.setOnClickListener { gotoFragment(SEARCH) }
 
         requestReloadAccount()
     }
@@ -167,12 +169,13 @@ class MainActivity : SwipeBackAppCompatActivity() {
     }
 
     inner class ViewPagerAdapter(fragment: FragmentActivity) : FragmentStateAdapter(fragment) {
-        override fun getItemCount(): Int = 2
+        override fun getItemCount(): Int = 3
 
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 HOME_PAGE -> HomePageFragment()
                 FAV_LIST -> FavListFragment()
+                SEARCH -> SearchFragment()
                 else -> null!!
             }
         }
@@ -181,6 +184,7 @@ class MainActivity : SwipeBackAppCompatActivity() {
     companion object {
         private const val HOME_PAGE = 0
         private const val FAV_LIST = 1
-        private const val DYNAMIC = 2
+        private const val SEARCH = 2
+        private const val DYNAMIC = 3
     }
 }

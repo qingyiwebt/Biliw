@@ -53,8 +53,7 @@
         <item name="android:textAppearance">@style/Text.Button</item>
     </style>
 
-    <style name="PlayerControllerBar">
-    </style>
+    <style name="PlayerControllerBar"></style>
 
     <style name="Drawer">
         <item name="android:background">?android:attr/colorPrimary</item>

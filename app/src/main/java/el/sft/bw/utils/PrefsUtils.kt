@@ -1,7 +1,9 @@
 package el.sft.bw.utils
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import el.sft.bw.App
 import okhttp3.Cookie
 import okhttp3.CookieJar
@@ -11,11 +13,27 @@ import okhttp3.HttpUrl
 object PrefsUtils {
     private const val prefsId = "el.sft.bw"
     private const val cookieJarKey = "COOKIE_JAR"
+    private const val searchHistoryKey = "SEARCH_HISTORY"
 
-    val currentPreferences =
+    val currentPreferences: SharedPreferences =
         App.current.applicationContext.getSharedPreferences(prefsId, Context.MODE_PRIVATE)
 
     val currentCookieJar = PrefsCookieJar()
+
+    val searchHistory: MutableList<String> =
+        Gson().fromJson(
+            currentPreferences.getString(searchHistoryKey, "[]"),
+            object : TypeToken<MutableList<String>>() {}.type
+        )
+
+    fun putSearchHistory(str: String) {
+        if (searchHistory.contains(str)) return
+        searchHistory.add(0, str)
+        if (searchHistory.size > 20) searchHistory.removeAt(20)
+        currentPreferences.edit()
+            .putString(searchHistoryKey, Gson().toJson(searchHistory))
+            .apply()
+    }
 
     class PrefsCookieJar : CookieJar {
         data class CookieStore(

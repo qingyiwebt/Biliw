@@ -130,4 +130,5 @@
     <string name="copied">已复制</string>
     <string name="userId">"UID: "</string>
     <string name="title_home_page">主页</string>
+    <string name="title_search">搜索</string>
 </resources>

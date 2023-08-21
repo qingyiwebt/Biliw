@@ -9,6 +9,7 @@ import androidx.viewpager2.widget.ViewPager2
 import el.sft.bw.R
 import el.sft.bw.databinding.ActivityUserCenterBinding
 import el.sft.bw.fragments.UserInfoFragment
+import el.sft.bw.fragments.UserVideosFragment
 import el.sft.bw.framework.activities.SwipeBackAppCompatActivity
 
 class UserCenterActivity : SwipeBackAppCompatActivity() {
@@ -42,14 +43,24 @@ class UserCenterActivity : SwipeBackAppCompatActivity() {
     }
 
     inner class ViewPagerAdapter(fragment: FragmentActivity) : FragmentStateAdapter(fragment) {
-        override fun getItemCount(): Int = 1
+        override fun getItemCount(): Int = 2
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 USER_INFO -> {
                     val fragment = UserInfoFragment()
-                    val arguments = Bundle()
-                    arguments.putLong("userId", userId)
-                    fragment.arguments = arguments
+                    Bundle().let {
+                        it.putLong("userId", userId)
+                        fragment.arguments = it
+                    }
+                    fragment
+                }
+
+                VIDEOS -> {
+                    val fragment = UserVideosFragment()
+                    Bundle().let {
+                        it.putLong("userId", userId)
+                        fragment.arguments = it
+                    }
                     fragment
                 }
 
@@ -60,6 +71,7 @@ class UserCenterActivity : SwipeBackAppCompatActivity() {
         fun getTitle(position: Int): Int {
             return when (position) {
                 USER_INFO -> R.string.title_user_info
+                VIDEOS -> R.string.title_video
                 else -> R.string.title_unknown
             }
         }
@@ -67,7 +79,7 @@ class UserCenterActivity : SwipeBackAppCompatActivity() {
 
     companion object {
         private const val USER_INFO = 0
-        private const val POSTS = 1
+        private const val VIDEOS = 1
         private const val DYNAMIC = 2
     }
 }
