@@ -113,6 +113,7 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/gotoHomePage"
                 style="@style/Button.Small.Transparent"
+                android:textAppearance="@style/Text.Drawer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/title_home_page" />
@@ -120,6 +121,7 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/gotoFavorite"
                 style="@style/Button.Small.Transparent"
+                android:textAppearance="@style/Text.Drawer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/title_favorite" />

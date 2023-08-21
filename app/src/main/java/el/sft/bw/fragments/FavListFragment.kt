@@ -4,21 +4,25 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import el.sft.bw.R
 import el.sft.bw.activities.FavoriteVideosActivity
-import el.sft.bw.components.VideoCardData
+import el.sft.bw.components.FavListItemLayout
 import el.sft.bw.databinding.FragmentFavListBinding
+import el.sft.bw.framework.SpacingDecoration
+import el.sft.bw.framework.components.RecyclerItemClickListener
+import el.sft.bw.framework.viewbinding.ListBindingAdapter
 import el.sft.bw.network.ApiClient
 import el.sft.bw.network.model.FavListModel
-import el.sft.bw.network.model.VideoModel
 import el.sft.bw.utils.LocalBroadcastUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -29,8 +33,9 @@ import kotlinx.coroutines.withContext
 class FavListFragment : Fragment() {
     private lateinit var localBroadcastManager: LocalBroadcastManager
     private lateinit var binding: FragmentFavListBinding
-    private var favListModelList: MutableList<FavListModel> = mutableListOf()
-    private lateinit var favListArrayAdapter: FavListArrayAdapter
+
+    private val favListModelList: ArrayList<FavListModel> = ArrayList()
+    private var favListArrayAdapter = ListBindingAdapter(favListModelList) { FavListItemLayout() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,16 +52,28 @@ class FavListFragment : Fragment() {
             )
         }
 
-        favListArrayAdapter = FavListArrayAdapter(requireContext(), favListModelList)
         binding.favList.adapter = favListArrayAdapter
-        binding.favList.setOnItemClickListener { _, _, position, _ ->
-            val item = favListArrayAdapter.getItem(position)
 
-            Intent(requireContext(), FavoriteVideosActivity::class.java).also {
-                it.putExtra("mlid", item!!.id)
-                startActivity(it)
-            }
-        }
+        binding.favList.adapter = favListArrayAdapter
+        binding.favList.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+
+        binding.favList.addOnItemTouchListener(
+            RecyclerItemClickListener(
+                requireContext(),
+                binding.favList,
+                object : RecyclerItemClickListener.OnItemClickListener {
+                    override fun onItemClick(view: View?, position: Int) {
+                        val item = favListModelList[position]
+
+                        Intent(requireContext(), FavoriteVideosActivity::class.java).also {
+                            it.putExtra("mlid", item!!.id)
+                            startActivity(it)
+                        }
+                    }
+                    override fun onLongItemClick(view: View?, position: Int) {}
+                })
+        )
 
         binding.refreshLayout.setOnRefreshListener { requestReloadFavList() }
 
