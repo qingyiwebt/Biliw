@@ -23,6 +23,7 @@ import el.sft.bw.framework.activities.SwipeBackAppCompatActivity
 import el.sft.bw.network.ApiClient
 import el.sft.bw.network.dto.NavResponse
 import el.sft.bw.utils.LocalBroadcastUtils
+import el.sft.bw.utils.runWithActivity
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -109,7 +110,7 @@ class MainActivity : SwipeBackAppCompatActivity() {
                 ApiClient.reloadCookie();
                 val res = ApiClient.getUserInfoFromNav()
 
-                withContext(Dispatchers.Main) {
+                runWithActivity(this@MainActivity) {
                     userData = res.data!!
                     isLoggedIn = userData!!.isLogin
 
@@ -117,7 +118,7 @@ class MainActivity : SwipeBackAppCompatActivity() {
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                withContext(Dispatchers.Main) {
+                runWithActivity(this@MainActivity) {
                     Toast
                         .makeText(
                             this@MainActivity,

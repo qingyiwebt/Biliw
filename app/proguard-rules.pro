@@ -19,3 +19,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep class el.sft.bw.network.** { *; }
+-keep class el.sft.bw.utils.** { *; }
+# -keep class com.journeyapps.barcodescanner.** { *; }
+# -keep class okhttp3.** { *; }
+-keepattributes Signature
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+-keepattributes AnnotationDefault,RuntimeVisibleAnnotations

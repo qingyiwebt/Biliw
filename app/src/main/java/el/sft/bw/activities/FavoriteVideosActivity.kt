@@ -16,6 +16,7 @@ import el.sft.bw.framework.activities.SwipeBackAppCompatActivity
 import el.sft.bw.framework.components.RecyclerItemClickListener
 import el.sft.bw.framework.viewbinding.ListBindingAdapter
 import el.sft.bw.network.ApiClient
+import el.sft.bw.utils.runWithActivity
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -95,7 +96,7 @@ class FavoriteVideosActivity : SwipeBackAppCompatActivity() {
             try {
                 ApiClient.reloadCookie()
                 val res = ApiClient.getFavVideos(currentMlid, currentPage)
-                withContext(Dispatchers.Main) {
+                runWithActivity(this@FavoriteVideosActivity) {
                     val beforeCount = videoList.size
                     val list = res.data!!.items
 
@@ -116,7 +117,7 @@ class FavoriteVideosActivity : SwipeBackAppCompatActivity() {
                 currentPage++
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                withContext(Dispatchers.Main) {
+                runWithActivity(this@FavoriteVideosActivity) {
                     Toast
                         .makeText(
                             this@FavoriteVideosActivity,
@@ -126,7 +127,7 @@ class FavoriteVideosActivity : SwipeBackAppCompatActivity() {
                         .show()
                 }
             } finally {
-                withContext(Dispatchers.Main) {
+                runWithActivity(this@FavoriteVideosActivity) {
                     binding.refreshLayout.isRefreshing = false
                 }
             }

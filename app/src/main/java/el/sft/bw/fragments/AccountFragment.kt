@@ -18,6 +18,7 @@ import el.sft.bw.framework.components.ScrollableFragment
 import el.sft.bw.network.ApiClient
 import el.sft.bw.utils.LocalBroadcastUtils
 import el.sft.bw.utils.PrefsUtils
+import el.sft.bw.utils.runWithFragment
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -67,25 +68,25 @@ class AccountFragment : ScrollableFragment() {
                 ApiClient.reloadCookie();
                 val res = ApiClient.getUserInfoFromNav()
 
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@AccountFragment) {
                     val data = res.data!!
                     val loggedIn = data.isLogin!!
                     binding.nonLoginPanel.visibility = if (loggedIn) View.GONE else View.VISIBLE
                     binding.loginPanel.visibility = if (!loggedIn) View.GONE else View.VISIBLE
 
-                    if (!loggedIn) return@withContext
+                    if (!loggedIn) return@runWithFragment
                     binding.accountText.text = data.uname!!
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@AccountFragment) {
                     val ctx = requireContext()
                     Toast
                         .makeText(ctx, ctx.getText(R.string.error_load_failed), Toast.LENGTH_LONG)
                         .show()
                 }
             } finally {
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@AccountFragment) {
                     binding.loadingPanel.visibility = View.GONE
                 }
             }

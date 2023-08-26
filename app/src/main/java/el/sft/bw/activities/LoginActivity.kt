@@ -3,6 +3,7 @@ package el.sft.bw.activities
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.zxing.BarcodeFormat
@@ -13,11 +14,11 @@ import el.sft.bw.framework.activities.SwipeBackAppCompatActivity
 import el.sft.bw.network.ApiClient
 import el.sft.bw.network.dto.QrCodeLoginResponse
 import el.sft.bw.utils.LocalBroadcastUtils
+import el.sft.bw.utils.runWithActivity
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class LoginActivity : SwipeBackAppCompatActivity() {
@@ -46,7 +47,7 @@ class LoginActivity : SwipeBackAppCompatActivity() {
             try {
                 val res = ApiClient.finishQrCodeLogin(qrCodeLoginResponse!!.authKey)
 
-                withContext(Dispatchers.Main) {
+                runWithActivity(this@LoginActivity) {
                     if (res.data is Double) {
                         val errorString = when (res.data) {
                             -1.0 -> R.string.error_login_incorrect_authkey
@@ -59,7 +60,7 @@ class LoginActivity : SwipeBackAppCompatActivity() {
                             .makeText(this@LoginActivity, errorString, Toast.LENGTH_LONG)
                             .show()
 
-                        return@withContext
+                        return@runWithActivity
                     }
 
                     if (res.data != null) {
@@ -73,13 +74,13 @@ class LoginActivity : SwipeBackAppCompatActivity() {
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                withContext(Dispatchers.Main) {
+                runWithActivity(this@LoginActivity) {
                     Toast
                         .makeText(this@LoginActivity, R.string.error_load_failed, Toast.LENGTH_LONG)
                         .show()
                 }
             } finally {
-                withContext(Dispatchers.Main) {
+                runWithActivity(this@LoginActivity) {
                     binding.finishLoginButton.isEnabled = true
                 }
             }
@@ -94,7 +95,7 @@ class LoginActivity : SwipeBackAppCompatActivity() {
                 val res = ApiClient.requestQrCodeLogin()
                 val data = res.data!!
                 qrCodeLoginResponse = data
-                withContext(Dispatchers.Main) {
+                runWithActivity(this@LoginActivity) {
                     val barcodeEncoder = BarcodeEncoder()
                     val bitmap: Bitmap =
                         barcodeEncoder.encodeBitmap(data.url, BarcodeFormat.QR_CODE, 400, 400)
@@ -103,7 +104,7 @@ class LoginActivity : SwipeBackAppCompatActivity() {
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                withContext(Dispatchers.Main) {
+                runWithActivity(this@LoginActivity) {
                     Toast
                         .makeText(this@LoginActivity, R.string.error_load_failed, Toast.LENGTH_LONG)
                         .show()

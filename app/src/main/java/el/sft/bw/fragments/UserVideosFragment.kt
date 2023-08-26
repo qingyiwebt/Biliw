@@ -18,6 +18,7 @@ import el.sft.bw.framework.components.RecyclerItemClickListener
 import el.sft.bw.framework.components.ScrollableFragment
 import el.sft.bw.framework.viewbinding.ListBindingAdapter
 import el.sft.bw.network.ApiClient
+import el.sft.bw.utils.runWithFragment
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -97,7 +98,7 @@ class UserVideosFragment : ScrollableFragment() {
             try {
                 ApiClient.reloadCookie()
                 val res = ApiClient.getUserVideos(currentUserId, currentPage)
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@UserVideosFragment) {
                     val list = res.data!!.videoList.videoList
 
                     val beforeCount = videoList.size
@@ -117,7 +118,7 @@ class UserVideosFragment : ScrollableFragment() {
                 currentPage++
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@UserVideosFragment) {
                     Toast
                         .makeText(
                             requireContext(),

@@ -22,6 +22,7 @@ import el.sft.bw.framework.components.ScrollableFragment
 import el.sft.bw.network.ApiClient
 import el.sft.bw.network.model.UserCardModel
 import el.sft.bw.network.simplestruct.VideoPage
+import el.sft.bw.utils.runWithFragment
 import el.sft.bw.utils.setClipboardPlainText
 import el.sft.bw.utils.toHumanReadable
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -128,7 +129,7 @@ class VideoInfoFragment : ScrollableFragment() {
                 val videoModel = res.data!!.videoModel
                 uploaderModel = res.data.card!!.videoOwner
 
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@VideoInfoFragment) {
                     binding.title.text = videoModel?.title ?: "-"
                     binding.viewCount.text = videoModel?.stat?.view?.toHumanReadable() ?: "-"
                     binding.description.text =
@@ -150,7 +151,7 @@ class VideoInfoFragment : ScrollableFragment() {
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@VideoInfoFragment) {
                     val ctx = requireContext()
                     Toast
                         .makeText(ctx, R.string.error_load_failed, Toast.LENGTH_LONG)

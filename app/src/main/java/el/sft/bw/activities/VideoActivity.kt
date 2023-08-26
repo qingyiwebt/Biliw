@@ -9,6 +9,7 @@ import el.sft.bw.R
 import el.sft.bw.databinding.ActivityVideoBinding
 import el.sft.bw.fragments.VideoInfoFragment
 import el.sft.bw.framework.activities.SwipeBackAppCompatActivity
+import el.sft.bw.utils.finishWithEmptyString
 
 class VideoActivity : SwipeBackAppCompatActivity() {
     private val viewPagerAdapter = ViewPagerAdapter(this)
@@ -21,7 +22,7 @@ class VideoActivity : SwipeBackAppCompatActivity() {
         setContentView(binding.root)
 
         intent.let {
-            currentBvId = it.getStringExtra("bvId") ?: run { finish();"" }
+            currentBvId = it.getStringExtra("bvId") ?: finishWithEmptyString()
         }
 
         binding.pager.adapter = viewPagerAdapter

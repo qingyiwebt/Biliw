@@ -20,6 +20,8 @@ import el.sft.bw.framework.components.RecyclerItemClickListener
 import el.sft.bw.framework.viewbinding.ListBindingAdapter
 import el.sft.bw.network.ApiClient
 import el.sft.bw.network.model.VideoModel
+import el.sft.bw.utils.runWithActivity
+import el.sft.bw.utils.runWithFragment
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -91,8 +93,8 @@ class RecommendedVideosFragment : Fragment() {
                 ApiClient.reloadCookie();
                 val res = ApiClient.getRecommendedVideos()
 
-                withContext(Dispatchers.Main) {
-                    val items: ArrayList<VideoModel> = res.data?.item ?: return@withContext
+                runWithFragment(this@RecommendedVideosFragment) {
+                    val items: ArrayList<VideoModel> = res.data?.item ?: return@runWithFragment
 
                     val beforeCount = videoList.size
                     videoList.addAll(items.map { x ->
@@ -112,14 +114,14 @@ class RecommendedVideosFragment : Fragment() {
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@RecommendedVideosFragment) {
                     val ctx = requireContext()
                     Toast
                         .makeText(ctx, R.string.error_load_failed, Toast.LENGTH_LONG)
                         .show()
                 }
             } finally {
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@RecommendedVideosFragment) {
                     binding.refreshLayout.isRefreshing = false
                 }
             }

@@ -24,6 +24,7 @@ import el.sft.bw.framework.viewbinding.ListBindingAdapter
 import el.sft.bw.network.ApiClient
 import el.sft.bw.network.model.FavListModel
 import el.sft.bw.utils.LocalBroadcastUtils
+import el.sft.bw.utils.runWithFragment
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -81,6 +82,7 @@ class FavListFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @OptIn(DelicateCoroutinesApi::class)
     private fun requestReloadFavList() {
         binding.refreshLayout.isRefreshing = true
@@ -91,7 +93,7 @@ class FavListFragment : Fragment() {
                 val userInfo = ApiClient.getUserInfoFromNav()
                 val favList = ApiClient.getFavLists(userInfo.data?.mid ?: 0)
 
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@FavListFragment) {
                     val list = favList.data?.list!!
 
                     favListModelList.clear()
@@ -100,14 +102,14 @@ class FavListFragment : Fragment() {
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@FavListFragment) {
                     val ctx = requireContext()
                     Toast
                         .makeText(ctx, R.string.error_load_failed, Toast.LENGTH_LONG)
                         .show()
                 }
             } finally {
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@FavListFragment) {
                     binding.refreshLayout.isRefreshing = false
                 }
             }

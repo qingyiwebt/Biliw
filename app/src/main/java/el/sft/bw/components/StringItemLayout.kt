@@ -5,15 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import el.sft.bw.R
 import el.sft.bw.framework.viewbinding.BindingLayout
-import el.sft.bw.network.model.FavListModel
 
 class StringItemLayout : BindingLayout() {
     private lateinit var view: TextView
 
     override fun onCreateLayout(context: Context, parent: ViewGroup): View {
         view = LayoutInflater.from(context)
-            .inflate(android.R.layout.simple_list_item_1, parent, false) as TextView
+            .inflate(R.layout.layout_simple_text_1, parent, false) as TextView
         return view
     }
 

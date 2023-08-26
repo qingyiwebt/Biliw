@@ -9,6 +9,7 @@ import el.sft.bw.network.dto.FavVideosResponse
 import el.sft.bw.network.dto.NavResponse
 import el.sft.bw.network.dto.QrCodeLoginResponse
 import el.sft.bw.network.dto.RecommendedVideosResponse
+import el.sft.bw.network.dto.SearchResponse
 import el.sft.bw.network.dto.UserCardResponse
 import el.sft.bw.network.dto.VideoDetailResponse
 import el.sft.bw.network.dto.VideoStreamResponse
@@ -60,6 +61,9 @@ object ApiClient {
 
     private val baseResponseWithUserVideosResponseType =
         object : TypeToken<BaseResponse<UserVideosResponse>>() {}.type
+
+    private val baseResponseWithSearchResponseType =
+        object : TypeToken<BaseResponse<SearchResponse>>() {}.type
 
     private var wbiKey = ""
 
@@ -358,6 +362,28 @@ object ApiClient {
         val str = res.body?.string()
 
         return Gson().fromJson(str, baseResponseWithUserVideosResponseType)
+    }
+
+    fun basicSearch(keyword: String): BaseResponse<SearchResponse> {
+        val query = generateSignedQuery(
+            mutableMapOf(
+                "keyword" to keyword,
+            )
+        )
+
+        val req = Request.Builder()
+            .url("https://api.bilibili.com/x/web-interface/search/all/v2?$query")
+            .header("Referer", "https://search.bilibili.com/")
+            .get()
+            .build()
+
+        val res = GlobalHttpClientUtils.httpClient
+            .newCall(req)
+            .execute()
+
+        val str = res.body?.string()
+
+        return Gson().fromJson(str, baseResponseWithSearchResponseType)
     }
 
     fun reloadCookie() {
