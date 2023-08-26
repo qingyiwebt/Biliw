@@ -38,10 +38,16 @@
         <activity
             android:name=".activities.PlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.VideoActivity"
-            android:exported="true" />
+            android:exported="false" />
         <activity
             android:name=".activities.LoginActivity"
             android:exported="false" />

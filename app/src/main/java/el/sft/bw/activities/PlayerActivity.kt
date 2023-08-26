@@ -1,6 +1,8 @@
 package el.sft.bw.activities
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -39,8 +41,9 @@ class PlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES;
+
+        loadIntent()
 
         player = ExoPlayer.Builder(this@PlayerActivity)
             .setSeekBackIncrementMs(5000)
@@ -61,7 +64,24 @@ class PlayerActivity : AppCompatActivity() {
 
         binding.controller.backAction = Runnable { finish() }
 
+        requestLoadPlayer()
+    }
+
+    override fun onDestroy() {
+        player.release()
+        super.onDestroy()
+    }
+
+    private fun loadIntent() {
+        if (intent.action == Intent.ACTION_SEND) {
+            currentSource = SOURCE_URL
+            currentUrl = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM).toString()
+            return
+        }
+
         intent.let {
+
+
             currentSource = it.getIntExtra("source", SOURCE_UNKNOWN)
 
             when (currentSource) {
@@ -76,13 +96,6 @@ class PlayerActivity : AppCompatActivity() {
                 }
             }
         }
-
-        requestLoadPlayer()
-    }
-
-    override fun onDestroy() {
-        player.release()
-        super.onDestroy()
     }
 
     private fun requestLoadPlayer() {

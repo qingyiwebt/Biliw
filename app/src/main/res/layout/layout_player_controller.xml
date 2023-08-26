@@ -15,6 +15,7 @@
         android:background="@drawable/background_top_bar_gradient"
         android:gravity="center"
         android:orientation="horizontal"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -65,6 +66,7 @@
         android:background="@drawable/background_bottom_bar_gradient"
         android:orientation="vertical"
         android:theme="@style/PlayerControllerBar"
+        android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
