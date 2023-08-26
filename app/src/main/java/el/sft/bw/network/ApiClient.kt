@@ -254,6 +254,12 @@ object ApiClient {
                 FormBody.Builder()
                     .add("bvid", bvId)
                     .add("cid", cid.toString())
+                    .add("dt", "2")
+                    .add("played_time", "0")
+                    .add("realtime", "10")
+                    .add("play_type", "0")
+                    .add("type", "3")
+                    .add("csrf", PrefsUtils.currentCookieJar.getCookie("bili_jct"))
                     .build()
             )
             .build()
@@ -350,7 +356,7 @@ object ApiClient {
         )
 
         val req = Request.Builder()
-            .url("https://api.bilibili.com/x/space/arc/search?$query")
+            .url("https://api.bilibili.com/x/space/wbi/arc/search?$query")
             .header("Referer", "https://space.bilibili.com/$userId")
             .get()
             .build()
@@ -360,6 +366,8 @@ object ApiClient {
             .execute()
 
         val str = res.body?.string()
+
+        Log.v("Request", str.toString())
 
         return Gson().fromJson(str, baseResponseWithUserVideosResponseType)
     }

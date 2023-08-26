@@ -57,6 +57,10 @@ object PrefsUtils {
                 .joinToString(";") { it.name + "=" + it.value }
         }
 
+        fun getCookie(name: String): String {
+            return cookieStore.cookieList.firstOrNull { it.name == name }?.value ?: ""
+        }
+
         private fun mergeCookieList(cookies: List<Cookie>) {
             val origin = cookieStore.cookieList
             val list = cookies.toMutableList()
