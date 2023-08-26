@@ -40,9 +40,9 @@
                 android:layout_height="wrap_content"
                 android:minHeight="96dp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/finishLoginButton"
-                style="@style/Button.ExtremeSmall"
+                style="@style/Button.Small"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/finish_login" />

@@ -27,7 +27,7 @@
             android:inputType="text|textNoSuggestions|textUri"
             tools:text="http://microsoft.com" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/playButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

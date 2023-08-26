@@ -1,6 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Biliw" parent="Theme.Material3.DayNight.NoActionBar" />
+    <style name="Base.Theme.Biliw" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/pink</item>
+        <item name="colorPrimaryDark">@color/pink</item>
+        <item name="colorAccent">@color/pink</item>
+        <item name="android:colorForeground">@color/icon_default_color</item>
+    </style>
 
     <style name="Text" parent="@style/TextAppearance.AppCompat.Small">
         <item name="android:textSize">11sp</item>
@@ -22,7 +27,7 @@
     </style>
 
     <style name="VectorIcon">
-        <item name="android:backgroundTint">#555555</item>
+        <item name="android:backgroundTint">?android:attr/colorForeground</item>
     </style>
 
     <style name="VectorIcon.Inverse">
@@ -47,6 +52,13 @@
         <item name="android:minWidth">0dp</item>
         <item name="android:padding">2dp</item>
     </style>
+
+
+    <style name="Button.Small" parent="Button.Small.Transparent">
+        <item name="android:background">?android:attr/colorPrimary</item>
+        <item name="android:textAppearance">@style/Text.Button</item>
+    </style>
+
 
     <style name="Button.ExtremeSmall" parent="Button.ExtremeSmall.Transparent">
         <item name="android:background">?android:attr/colorPrimary</item>

@@ -59,51 +59,49 @@ class UserInfoFragment : ScrollableFragment() {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private fun requestLoadUserInfo() {
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                ApiClient.reloadCookie();
+    private fun requestLoadUserInfo() = GlobalScope.launch(Dispatchers.IO) {
+        try {
+            ApiClient.reloadCookie();
 
-                val spaceRes = ApiClient.getUserSpaceInfo(currentUserId)
-                val spaceData = spaceRes.data!!
-                val cardRes = ApiClient.getUserCardInfo(currentUserId)
-                val cardData = cardRes.data!!.card!!
+            val spaceRes = ApiClient.getUserSpaceInfo(currentUserId)
+            val spaceData = spaceRes.data!!
+            val cardRes = ApiClient.getUserCardInfo(currentUserId)
+            val cardData = cardRes.data!!.card!!
 
-                runWithFragment(this@UserInfoFragment) {
-                    binding.uploaderName.text = cardData.name ?: "-"
-                    binding.followerCount.text = (cardData.followerCount ?: 0L).toHumanReadable()
-                    binding.followCount.text = (cardData.followCount ?: 0L).toHumanReadable()
-                    binding.description.text = cardData.description ?: "-"
-                    val detailStringJoiner = StringJoiner(" ")
-                    detailStringJoiner.add("LV${cardData.levelInfo?.level ?: 0}")
+            runWithFragment(this@UserInfoFragment) {
+                binding.uploaderName.text = cardData.name ?: "-"
+                binding.followerCount.text = (cardData.followerCount ?: 0L).toHumanReadable()
+                binding.followCount.text = (cardData.followCount ?: 0L).toHumanReadable()
+                binding.description.text = cardData.description ?: "-"
+                val detailStringJoiner = StringJoiner(" ")
+                detailStringJoiner.add("LV${cardData.levelInfo?.level ?: 0}")
 
-                    detailStringJoiner.add(if (spaceData.isSeniorMember == 1) "硬核会员" else "")
+                detailStringJoiner.add(if (spaceData.isSeniorMember == 1) "硬核会员" else "")
 
-                    detailStringJoiner.add(
-                        when (cardData.vip?.vipType ?: 0) {
-                            0 -> "不是大会员"
-                            1 -> "月度大会员"
-                            2 -> "年度大会员"
-                            else -> "年度及以上大会员"
-                        }
-                    )
+                detailStringJoiner.add(
+                    when (cardData.vip?.vipType ?: 0) {
+                        0 -> "不是大会员"
+                        1 -> "月度大会员"
+                        2 -> "年度大会员"
+                        else -> "年度及以上大会员"
+                    }
+                )
 
-                    binding.detail.text = detailStringJoiner.toString()
+                binding.detail.text = detailStringJoiner.toString()
 
-                    binding.followButton.text =
-                        getText(if (!spaceData.isFollowed) R.string.follow else R.string.unfollow)
-                    binding.avatarImage.load(cardData.face)
-                }
+                binding.followButton.text =
+                    getText(if (!spaceData.isFollowed) R.string.follow else R.string.unfollow)
+                binding.avatarImage.load(cardData.face)
+            }
 
-                loaded = true
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                runWithFragment(this@UserInfoFragment) {
-                    val ctx = requireContext()
-                    Toast
-                        .makeText(ctx, R.string.error_load_failed, Toast.LENGTH_LONG)
-                        .show()
-                }
+            loaded = true
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            runWithFragment(this@UserInfoFragment) {
+                val ctx = requireContext()
+                Toast
+                    .makeText(ctx, R.string.error_load_failed, Toast.LENGTH_LONG)
+                    .show()
             }
         }
     }

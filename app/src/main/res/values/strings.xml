@@ -131,4 +131,7 @@
     <string name="userId">"UID: "</string>
     <string name="title_home_page">主页</string>
     <string name="title_search">搜索</string>
+    <string name="error_success">操作成功</string>
+    <string name="error_not_loggedin">账号未登录</string>
+    <string name="error_csrf">CSRF错误</string>
 </resources>

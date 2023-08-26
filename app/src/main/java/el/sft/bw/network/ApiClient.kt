@@ -65,6 +65,9 @@ object ApiClient {
     private val baseResponseWithSearchResponseType =
         object : TypeToken<BaseResponse<SearchResponse>>() {}.type
 
+    private val baseResponseWithIntType =
+        object : TypeToken<BaseResponse<Int>>() {}.type
+
     private var wbiKey = ""
 
     fun generateSignedQuery(map: MutableMap<String, String> = HashMap()): String {
@@ -86,6 +89,8 @@ object ApiClient {
         val subKey = Path(data.subUrl!!).nameWithoutExtension
         wbiKey = CryptoUtils.getWbiKey(imgKey, subKey)
     }
+
+    fun getCsrf() = PrefsUtils.currentCookieJar.getCookie("bili_jct")
 
     fun requestQrCodeLogin(): BaseResponse<QrCodeLoginResponse> {
         val query = generateSignedQuery()
@@ -259,7 +264,7 @@ object ApiClient {
                     .add("realtime", "10")
                     .add("play_type", "0")
                     .add("type", "3")
-                    .add("csrf", PrefsUtils.currentCookieJar.getCookie("bili_jct"))
+                    .add("csrf", getCsrf())
                     .build()
             )
             .build()
@@ -370,6 +375,53 @@ object ApiClient {
         Log.v("Request", str.toString())
 
         return Gson().fromJson(str, baseResponseWithUserVideosResponseType)
+    }
+
+
+    fun setLikeState(bvId: String, videoLiked: Boolean): BaseResponse<Any> {
+        val query = generateSignedQuery()
+
+        val req = Request.Builder()
+            .url("https://api.bilibili.com/x/web-interface/archive/like?$query")
+            .header("Referer", "https://www.bilibili.com/video/$bvId")
+            .post(
+                FormBody.Builder()
+                    .add("bvid", bvId)
+                    .add("like", if (videoLiked) "1" else "2")
+                    .add("csrf", getCsrf())
+                    .build()
+            )
+            .build()
+
+        val res = GlobalHttpClientUtils.httpClient
+            .newCall(req)
+            .execute()
+
+        val str = res.body?.string()
+
+        return Gson().fromJson(str, baseResponseWithAnyType)
+    }
+
+    fun getLikedStat(bvId: String): BaseResponse<Int> {
+        val query = generateSignedQuery(
+            mutableMapOf(
+                "bvid" to bvId
+            )
+        )
+
+        val req = Request.Builder()
+            .url("https://api.bilibili.com/x/web-interface/archive/has/like?$query")
+            .header("Referer", "https://www.bilibili.com/video/$bvId")
+            .get()
+            .build()
+
+        val res = GlobalHttpClientUtils.httpClient
+            .newCall(req)
+            .execute()
+
+        val str = res.body?.string()
+
+        return Gson().fromJson(str, baseResponseWithIntType)
     }
 
     fun basicSearch(keyword: String): BaseResponse<SearchResponse> {

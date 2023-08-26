@@ -5,6 +5,6 @@ import el.sft.bw.network.model.VideoModel
 import el.sft.bw.network.simplestruct.VideoDetailCard
 
 data class VideoDetailResponse(
-    @SerializedName("View") val videoModel: VideoModel?,
-    @SerializedName("Card") val card: VideoDetailCard?,
+    @SerializedName("View") val videoModel: VideoModel,
+    @SerializedName("Card") val card: VideoDetailCard,
 )

@@ -28,7 +28,6 @@ import kotlinx.coroutines.withContext
 class UserVideosFragment : ScrollableFragment() {
     private lateinit var binding: FragmentUserVideosBinding
 
-
     private var currentPage: Int = 1
     private var isEnded = false
 
@@ -128,7 +127,7 @@ class UserVideosFragment : ScrollableFragment() {
                         .show()
                 }
             } finally {
-                withContext(Dispatchers.Main) {
+                runWithFragment(this@UserVideosFragment) {
                     binding.refreshLayout.isRefreshing = false
                 }
             }

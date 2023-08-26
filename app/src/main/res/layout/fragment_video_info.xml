@@ -76,7 +76,7 @@
             <androidx.constraintlayout.helper.widget.Flow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="linearLayout,linearLayout2,linearLayout3,linearLayout4,linearLayout5"
+                app:constraint_referenced_ids="likeButton,linearLayout2,favButton,linearLayout4,linearLayout5"
                 app:flow_wrapMode="aligned"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -84,7 +84,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <LinearLayout
-                android:id="@+id/linearLayout"
+                android:id="@+id/likeButton"
                 android:layout_width="56dp"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
@@ -94,6 +94,7 @@
                 android:padding="8dp">
 
                 <ImageView
+                    android:id="@+id/likeIcon"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:background="@drawable/ic_baseline_thumb_up_24"
@@ -128,7 +129,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/linearLayout3"
+                android:id="@+id/favButton"
                 android:layout_width="56dp"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
